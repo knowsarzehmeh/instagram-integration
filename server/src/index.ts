@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
+import { connectToDb } from "./db/connection";
 
 // Load environment variables
 dotenv.config();
@@ -12,14 +12,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-const MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/instagram-integration";
-mongoose
-  .connect(MONGODB_URI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((error) => console.error("MongoDB connection error:", error));
-
 // Routes
 app.get("/", (req, res) => {
   res.json({ message: "Instagram Integration API" });
@@ -27,6 +19,17 @@ app.get("/", (req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+const startServer = async () => {
+  try {
+    await connectToDb();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
