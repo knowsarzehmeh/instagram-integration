@@ -1,3 +1,5 @@
+import { useMutation } from "@tanstack/react-query";
+import { Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,9 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Instagram } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
-import { authApi } from "@/utils/api";
+import { apiServices } from "@/utils/api";
 
 export function LoginPage() {
   const handleInstagramLogin = () => {
@@ -16,7 +16,7 @@ export function LoginPage() {
   };
 
   const loginMutation = useMutation({
-    mutationFn: authApi.login,
+    mutationFn: apiServices.login,
     onSuccess: (data) => {
       window.location.href = data.url;
     },

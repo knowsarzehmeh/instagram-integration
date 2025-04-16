@@ -1,0 +1,15 @@
+{
+  "server": {
+    "port": "PORT",
+    "host": "HOST"
+  },
+  "instagram": {
+    "graph_url": "INSTAGRAM_GRAPH_URL",
+    "client_id": "INSTAGRAM_CLIENT_ID",
+    "client_secret": "INSTAGRAM_CLIENT_SECRET",
+    "redirect_uri": "INSTAGRAM_REDIRECT_URI",
+    "api_url": "INSTAGRAM_API_URL",
+    "token_url": "INSTAGRAM_TOKEN_URL",
+    "app_id": "INSTAGRAM_APP_ID"
+  }
+}

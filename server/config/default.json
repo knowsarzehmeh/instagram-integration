@@ -1,0 +1,11 @@
+{
+  "server": {
+    "port": 5001,
+    "host": "localhost",
+    "client_url": "http://localhost:5173"
+  },
+  "instagram": {
+    "graph_url": "https://graph.instagram.com",
+    "api_version": "v18.0"
+  }
+}

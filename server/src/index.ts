@@ -1,11 +1,13 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import authRoutes from "./routes/authRoutes";
-import { connectToDb } from "./db/connection";
-
 // Load environment variables
 dotenv.config();
+
+import authRoutes from "./routes/authRoutes";
+import mediaRoutes from "./routes/mediaRoutes";
+import { connectToDb } from "./db/connection";
+import { serverConfig } from "./utils/config";
 
 const app = express();
 
@@ -21,13 +23,14 @@ connectToDb().catch((error) => {
 
 // Routes
 app.use("/auth", authRoutes);
+app.use("/media", mediaRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Instagram Integration API" });
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
+const PORT = serverConfig.port;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

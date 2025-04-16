@@ -1,10 +1,13 @@
 import { Request, Response } from "express";
 import { User } from "../models/User";
+import { instagramConfig, serverConfig } from "../utils/config";
 
-const INSTAGRAM_API_URL = "https://api.instagram.com/oauth/authorize";
-const INSTAGRAM_TOKEN_URL = "https://api.instagram.com/oauth/access_token";
-const INSTAGRAM_GRAPH_URL = "https://graph.instagram.com";
-
+const INSTAGRAM_API_URL = instagramConfig.api_url;
+const INSTAGRAM_TOKEN_URL = instagramConfig.token_url;
+const INSTAGRAM_GRAPH_URL = instagramConfig.graph_url;
+const CLIENT_URL = serverConfig.client_url;
+const INSTAGRAM_APP_ID = instagramConfig.app_id;
+const INSTAGRAM_REDIRECT_URI = instagramConfig.redirect_uri;
 interface TokenResponse {
   access_token: string;
   user_id: number;
@@ -20,15 +23,12 @@ interface ProfileResponse {
 export const authController = {
   loginWithInstagram: (req: Request, res: Response) => {
     const queryParams = new URLSearchParams({
-      client_id: process.env.INSTAGRAM_APP_ID || "",
-      redirect_uri: process.env.INSTAGRAM_REDIRECT_URI || "",
+      client_id: INSTAGRAM_APP_ID,
+      redirect_uri: INSTAGRAM_REDIRECT_URI,
       scope: "user_profile,user_media",
       response_type: "code",
     });
-
     const authUrl = `${INSTAGRAM_API_URL}?${queryParams.toString()}`;
-
-    console.log("authUrl", authUrl);
     res.json({ url: authUrl });
   },
 
@@ -82,16 +82,10 @@ export const authController = {
       );
 
       // Redirect to frontend with success
-      res.redirect(
-        `${process.env.CLIENT_URL || "http://localhost:5173"}?userId=${
-          user._id
-        }`
-      );
+      res.redirect(`${CLIENT_URL}?userId=${user._id}`);
     } catch (error) {
       console.error("Instagram authentication error:", error);
-      res.redirect(
-        `${process.env.CLIENT_URL || "http://localhost:5173"}/error`
-      );
+      res.redirect(`${CLIENT_URL}/error`);
     }
   },
 
