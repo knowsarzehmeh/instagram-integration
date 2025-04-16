@@ -10,6 +10,17 @@ export const api = axios.create({
   },
 });
 
+interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    currentPage: number;
+    limit: number;
+    total: number;
+    hasNextPage: boolean;
+    nextPage: number | null;
+  };
+}
+
 export const apiServices = {
   // Auth
   login: async () => {
@@ -53,9 +64,15 @@ export const apiServices = {
   },
 
   // Media
-  fetchMedia: async (userId: string): Promise<MediaItem[]> => {
+  fetchMedia: async (
+    userId: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<PaginatedResponse<MediaItem>> => {
     try {
-      const response = await api.get(`/media/${userId}`);
+      const response = await api.get(
+        `/media/${userId}?page=${page}&limit=${limit}`
+      );
       return response.data;
     } catch (error) {
       throw new Error("Failed to fetch media");
@@ -65,9 +82,9 @@ export const apiServices = {
   // Comments
   fetchComments: async (mediaId: string, userId: string) => {
     try {
-      const response = await api.get(`/media/${mediaId}/comments`, {
-        params: { userId },
-      });
+      const response = await api.get(
+        `/media/${mediaId}/comments?userId=${userId}`
+      );
       return response.data;
     } catch (error) {
       throw new Error("Failed to fetch comments");

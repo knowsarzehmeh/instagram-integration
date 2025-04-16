@@ -14,6 +14,17 @@ interface MediaResponse {
     comments_count: number;
     like_count: number;
   }>;
+  paging?: {
+    cursors?: {
+      before: string;
+      after: string;
+    };
+    next?: string;
+    previous?: string;
+  };
+  error?: {
+    message: string;
+  };
 }
 
 export const mediaController = {
@@ -21,20 +32,42 @@ export const mediaController = {
   getMedia: async (req: Request, res: Response) => {
     try {
       const { userId } = req.params;
+      const { page = 1, limit = 10 } = req.query;
       const user = await User.findById(userId);
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Fetch media from Instagram API
+      // Calculate offset based on page and limit
+      const offset = (Number(page) - 1) * Number(limit);
+
+      // Fetch media from Instagram API with pagination
       const response = await fetch(
-        `${INSTAGRAM_GRAPH_URL}/me/media?fields=id,media_type,media_url,caption,timestamp,permalink,comments_count,like_count&access_token=${user.accessToken}`
+        `${INSTAGRAM_GRAPH_URL}/me/media?fields=id,media_type,media_url,caption,timestamp,permalink,comments_count,like_count&access_token=${user.accessToken}&limit=${limit}&offset=${offset}`
       );
 
       const mediaData = (await response.json()) as MediaResponse;
 
-      res.json(mediaData.data);
+      // If there's an error in the Instagram API response
+      if (mediaData.error) {
+        return res.status(400).json({
+          message:
+            mediaData.error.message || "Failed to fetch media from Instagram",
+        });
+      }
+
+      // Return paginated response
+      res.json({
+        data: mediaData.data,
+        pagination: {
+          currentPage: Number(page),
+          limit: Number(limit),
+          total: mediaData.data.length,
+          hasNextPage: !!mediaData.paging?.next,
+          nextPage: mediaData.paging?.next ? Number(page) + 1 : null,
+        },
+      });
     } catch (error) {
       console.error("Error fetching media:", error);
       res.status(500).json({ message: "Internal server error" });
