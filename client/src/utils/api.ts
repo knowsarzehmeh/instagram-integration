@@ -11,6 +11,7 @@ export const api = axios.create({
 });
 
 export const apiServices = {
+  // Auth
   login: async () => {
     try {
       const response = await api.get("/auth/login");
@@ -19,6 +20,7 @@ export const apiServices = {
       throw new Error("Failed to login");
     }
   },
+
   getAuthState: async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get("userId");
@@ -28,7 +30,6 @@ export const apiServices = {
     }
 
     try {
-      // Verify the user exists and get their profile
       const profile = await apiServices.fetchProfile(userId);
       return { isAuthenticated: true, userId, profile };
     } catch (error) {
@@ -40,6 +41,18 @@ export const apiServices = {
     // Clear any auth-related data
     window.history.replaceState({}, "", "/");
   },
+
+  // Profile
+  fetchProfile: async (userId: string): Promise<UserProfile> => {
+    try {
+      const response = await api.get(`/auth/profile/${userId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error("Failed to fetch profile");
+    }
+  },
+
+  // Media
   fetchMedia: async (userId: string): Promise<MediaItem[]> => {
     try {
       const response = await api.get(`/media/${userId}`);
@@ -48,12 +61,36 @@ export const apiServices = {
       throw new Error("Failed to fetch media");
     }
   },
-  fetchProfile: async (userId: string): Promise<UserProfile> => {
+
+  // Comments
+  fetchComments: async (mediaId: string, userId: string) => {
     try {
-      const response = await api.get(`/profile/${userId}`);
+      const response = await api.get(`/media/${mediaId}/comments`, {
+        params: { userId },
+      });
       return response.data;
     } catch (error) {
-      throw new Error("Failed to fetch profile");
+      throw new Error("Failed to fetch comments");
+    }
+  },
+
+  replyToComment: async (
+    mediaId: string,
+    commentId: string,
+    userId: string,
+    message: string
+  ) => {
+    try {
+      const response = await api.post(
+        `/media/${mediaId}/comments/${commentId}/reply`,
+        {
+          userId,
+          message,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error("Failed to reply to comment");
     }
   },
 };

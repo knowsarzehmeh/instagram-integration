@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { MessageCircle, Heart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+
+import { Comments } from "./Comments";
 import { apiServices } from "@/utils/api";
 import { MediaItem } from "@/utils/types";
 
@@ -10,29 +13,15 @@ interface MediaFeedProps {
 }
 
 export function MediaFeed({ userId }: MediaFeedProps) {
-  const {
-    data: media,
-    isLoading,
-    isError,
-    error,
-  } = useQuery<MediaItem[], Error>({
+  const [selectedMediaId, setSelectedMediaId] = useState<string | null>(null);
+
+  const { data: mediaItems = [], isLoading } = useQuery<MediaItem[]>({
     queryKey: ["media", userId],
     queryFn: () => apiServices.fetchMedia(userId),
-    enabled: !!userId,
   });
 
   if (isLoading) {
     return <div className="text-center">Loading media...</div>;
-  }
-
-  if (isError) {
-    return (
-      <div className="text-center text-red-500">Error: {error.message}</div>
-    );
-  }
-
-  if (!media || media.length === 0) {
-    return <div className="text-center">No media found</div>;
   }
 
   const MediaType = {
@@ -41,15 +30,15 @@ export function MediaFeed({ userId }: MediaFeedProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {media.map((item) => (
+    <div className="space-y-4">
+      {mediaItems.map((item) => (
         <Card key={item.id}>
           <CardHeader>
             <CardTitle className="text-sm text-muted-foreground">
               {new Date(item.timestamp).toLocaleDateString()}
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             {item.media_type === MediaType.IMAGE && (
               <img
                 src={item.media_url}
@@ -70,11 +59,24 @@ export function MediaFeed({ userId }: MediaFeedProps) {
                 <Heart className="w-4 h-4 mr-2" />
                 {item.like_count}
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  setSelectedMediaId(
+                    selectedMediaId === item.id ? null : item.id
+                  )
+                }
+              >
                 <MessageCircle className="w-4 h-4 mr-2" />
                 {item.comments_count}
               </Button>
             </div>
+            {selectedMediaId === item.id && (
+              <div className="mt-4">
+                <Comments mediaId={item.id} userId={userId} />
+              </div>
+            )}
           </CardContent>
         </Card>
       ))}
