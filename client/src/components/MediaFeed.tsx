@@ -13,7 +13,7 @@ interface MediaFeedProps {
 
 export function MediaFeed({ userId }: MediaFeedProps) {
   const [selectedMediaId, setSelectedMediaId] = useState<string | null>(null);
-  const { ref, inView } = useInView({
+  const { ref } = useInView({
     threshold: 0,
     onChange: (inView) => {
       if (inView && hasNextPage && !isFetchingNextPage) {
