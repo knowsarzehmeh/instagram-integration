@@ -25,7 +25,7 @@ connectToDb().catch((error) => {
 app.use("/auth", authRoutes);
 app.use("/media", mediaRoutes);
 
-app.get("/", (req, res) => {
+app.get("/", (_, res) => {
   res.json({ message: "Instagram Integration API" });
 });
 

@@ -58,7 +58,7 @@ export const mediaController = {
       }
 
       // Return paginated response
-      res.json({
+      return res.json({
         data: mediaData.data,
         pagination: {
           currentPage: Number(page),
@@ -70,7 +70,7 @@ export const mediaController = {
       });
     } catch (error) {
       console.error("Error fetching media:", error);
-      res.status(500).json({ message: "Internal server error" });
+      return res.status(500).json({ message: "Internal server error" });
     }
   },
 
@@ -93,10 +93,10 @@ export const mediaController = {
 
       const commentsData = await response.json();
 
-      res.json(commentsData);
+      return res.json(commentsData);
     } catch (error) {
       console.error("Error fetching comments:", error);
-      res.status(500).json({ message: "Internal server error" });
+      return res.status(500).json({ message: "Internal server error" });
     }
   },
 
@@ -130,10 +130,10 @@ export const mediaController = {
 
       const replyData = await response.json();
 
-      res.json(replyData);
+      return res.json(replyData);
     } catch (error) {
       console.error("Error replying to comment:", error);
-      res.status(500).json({ message: "Internal server error" });
+      return res.status(500).json({ message: "Internal server error" });
     }
   },
 };

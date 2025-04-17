@@ -21,7 +21,7 @@ interface ProfileResponse {
 }
 
 export const authController = {
-  loginWithInstagram: (req: Request, res: Response) => {
+  loginWithInstagram: (_: Request, res: Response) => {
     const queryParams = new URLSearchParams({
       client_id: INSTAGRAM_APP_ID,
       redirect_uri: INSTAGRAM_REDIRECT_URI,
@@ -99,10 +99,10 @@ export const authController = {
         return res.status(404).json({ message: "User not found" });
       }
 
-      res.json(user);
+      return res.json(user);
     } catch (error) {
       console.error("Error fetching user profile:", error);
-      res.status(500).json({ message: "Internal server error" });
+      return res.status(500).json({ message: "Internal server error" });
     }
   },
 };
